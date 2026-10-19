@@ -1459,7 +1459,8 @@ ThreadEntry* Core::RegisterThread(const ThreadDescription& description, EventSto
 
 	ThreadEntry* entry = nullptr;
 
-	auto it = std::find_if(threads.begin(), threads.end(), [&description](const ThreadEntry* entry) { return entry->description == description; });
+	// A dead entry keeps its exited thread's TLS pointer, so a new thread with its id and name gets a fresh one
+	auto it = std::find_if(threads.begin(), threads.end(), [&description](const ThreadEntry* entry) { return entry->isAlive && entry->description == description; });
 	if (it == threads.end())
 	{
 		entry = Memory::New<ThreadEntry>(description, slot);
